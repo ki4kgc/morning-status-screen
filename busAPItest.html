@@ -6,35 +6,74 @@
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 </head> 
 
+<style>
+	table, th, td {
+	    border: 1px solid black;
+	}
+</style>
+
 <body>
 
-<p>
-This is some text on the page
+<h1 id="predictionsHeading">Stop Name</h1>
+
+<p id="predictionsParagraph">
+This is where the predictions paragraph will populate
 </p>	
 
-<body>
+<p id="predictionsTable">
+This is where the predictions table will populate
+</p>	
+
+</body>
 <script type="text/javascript">
    $(function() {
       var params = {
-         // Specify your subscription key
-         'api_key': 'kfgpmgvfgacx98de9q3xazww',
-         // Specify values for the following required parameters
-         'StopID': "1001056",
+        // Specify your subscription key
+        'api_key': 'kfgpmgvfgacx98de9q3xazww',
+        // Specify values for the following required parameters
+        'StopID': "1001056",
       };
       
       $.ajax({
-         url: 'https://api.wmata.com/NextBusService.svc/json/jPredictions?' + $.param(params),
-         type: 'GET',
+	    url: 'https://api.wmata.com/NextBusService.svc/json/jPredictions?' + $.param(params),
+	    type: 'GET',
       })
       .done(function(data) {
       	console.log(data);
-      	document.write(JSON.stringify(data));
-         alert("success");
+      	var obj = data;
+      	//alert("START");
+      	document.getElementById("predictionsHeading").innerHTML = obj.StopName;
+
+      	showParagraph(obj);
+      	showTable(obj);
       })
       .fail(function() {
-         alert("error");
+        alert("error");
       });
    });
+	function showParagraph(obj){
+		var tableOfPredictions = "";
+
+      	for (var i = 0; i < obj.Predictions.length; i++) {
+
+      		tableOfPredictions += "Bus route " + obj.Predictions[i].RouteID + " " + obj.Predictions[i].DirectionText + " in " + obj.Predictions[i].Minutes + " Minutes <br>";
+      	};
+      	tableOfPredictions += "";
+      	document.getElementById("predictionsParagraph").innerHTML = tableOfPredictions;
+        console.log("success showing as paragraph");
+	}
+
+	function showTable(obj){
+		var tableOfPredictions = "<table><tr><th>Bus Route</th><th>Direction</th><th>Minutes</th></tr>";
+
+      	for (var i = 0; i < obj.Predictions.length; i++) {
+
+      		tableOfPredictions += "<tr><td>" + obj.Predictions[i].RouteID + "</td><td>" + obj.Predictions[i].DirectionText + "</td><td>" + obj.Predictions[i].Minutes + "</td></tr>";
+      	};
+      	tableOfPredictions += "</table>";
+      	document.getElementById("predictionsTable").innerHTML = tableOfPredictions;
+        console.log("success showing as table");
+	}
 </script>
 
 </body>
